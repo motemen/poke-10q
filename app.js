@@ -32,16 +32,31 @@ const STALL = [
   "今、ちょっとお腹が空いていますか？",
 ];
 
-// 画像は scripts/build-sprites.py で作る 1 枚のスプライトシート（32 列 × 96px）から切り出す。
-// artifact などでは外部画像を読めないため、ページと同じ場所に置いた sprites.png だけを使う。
+// 画像は 2 通り。
+// - 通常（GitHub Pages など）: PokeAPI/sprites の画像を 1 匹ずつ直接読む。
+// - artifact: 外部画像を読めないので、build-artifact.mjs が window.SPRITE_SHEET を設定し、
+//   scripts/build-sprites.py で作った 1 枚のスプライトシート（32 列 × 96px）から切り出す。
+const SPRITE_URL = (id) => `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
+const SHEET = window.SPRITE_SHEET;
 const SHEET_COLS = 32;
 const SHEET_ROWS = Math.ceil(ALL.length / SHEET_COLS);
 function sprite(p, className = "") {
+  const cls = `sprite ${className}`.trim();
+  if (!SHEET) {
+    const img = document.createElement("img");
+    img.className = cls;
+    img.src = SPRITE_URL(p.id);
+    img.alt = p.name;
+    img.loading = "lazy";
+    img.decoding = "async";
+    return img;
+  }
   const el = document.createElement("div");
-  el.className = `sprite ${className}`.trim();
+  el.className = cls;
   el.setAttribute("role", "img");
   el.setAttribute("aria-label", p.name);
   const i = p.id - 1;
+  el.style.backgroundImage = `url("${SHEET}")`;
   el.style.backgroundPosition =
     `${((i % SHEET_COLS) / (SHEET_COLS - 1)) * 100}% ${(Math.floor(i / SHEET_COLS) / (SHEET_ROWS - 1)) * 100}%`;
   el.style.backgroundSize = `${SHEET_COLS * 100}% ${SHEET_ROWS * 100}%`;

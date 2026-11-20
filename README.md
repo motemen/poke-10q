@@ -8,6 +8,9 @@
 ## 動かし方
 
 ビルド不要。`index.html` をブラウザで開くだけです（`file://` でも動きます）。
+ポケモンの画像は [PokeAPI/sprites](https://github.com/PokeAPI/sprites) の `sprites/pokemon/{id}.png` を直接読み込みます。
+
+main に push すると GitHub Actions（`.github/workflows/pages.yml`）で GitHub Pages に公開されます。
 
 ## データの再生成
 
@@ -21,17 +24,12 @@ done
 cd .. && node scripts/build-data.mjs csv
 ```
 
-画像は [PokeAPI/sprites](https://github.com/PokeAPI/sprites) の `sprites/pokemon/{id}.png` を
-1 枚のスプライトシート `sprites.png` にまとめて使っています（外部画像を読めない環境でも表示できるように）。
-
-```sh
-python3 scripts/build-sprites.py <1.png〜1025.png を置いたディレクトリ>
-```
-
 ## Artifact 用ビルド
 
-claude.ai の Artifact 向けに、CSS・JS・データをインライン化した `dist/index.html` と `dist/sprites.png` を作ります。
+claude.ai の Artifact では外部の画像を読めないので、CSS・JS・データをインライン化した `dist/index.html` と、
+全ポケモンの画像を 1 枚にまとめたスプライトシート `dist/sprites.png` を作ります（どちらもリポジトリには入れません）。
 
 ```sh
+python3 scripts/build-sprites.py <PokeAPI/sprites の 1.png〜1025.png を置いたディレクトリ>
 node scripts/build-artifact.mjs
 ```

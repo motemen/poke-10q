@@ -224,11 +224,11 @@ button:focus-visible { outline: 3px solid var(--sun); outline-offset: 3px; }
 /* 普段は残っている候補だけ。脱落したものはアニメーションのあと消える */
 .grid:not(.show-all) .cell.out { display: none; }
 
-/* スプライトシートから 1 匹分を切り出して表示する（位置とサイズは app.js で指定） */
+/* PokeAPI の画像（img）か、スプライトシートの 1 匹分（div。画像・位置・サイズは app.js で指定） */
 .sprite {
+  display: block;
   aspect-ratio: 1;
   max-width: 100%;
-  background-image: url("sprites.png");
   background-repeat: no-repeat;
   image-rendering: pixelated;
 }

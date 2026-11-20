@@ -1,6 +1,6 @@
 """PokeAPI のスプライト 1..1025.png を 1 枚のスプライトシート sprites.png にまとめる。
 
-artifact などの外部画像を読めない環境でも表示できるように、画像はこの 1 ファイルだけにする。
+artifact など外部画像を読めない環境向け。dist/sprites.png に書き出す（リポジトリには入れない）。
 usage: python3 scripts/build-sprites.py <sprite-dir>
   <sprite-dir> には https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/{id}.png を置いておく
 """
@@ -17,6 +17,7 @@ for i in range(N):
     if im.size != (CELL, CELL):
         im = im.resize((CELL, CELL), Image.NEAREST)
     sheet.paste(im, ((i % COLS) * CELL, (i // COLS) * CELL))
-out = Path(__file__).resolve().parent.parent / "sprites.png"
+out = Path(__file__).resolve().parent.parent / "dist" / "sprites.png"
+out.parent.mkdir(exist_ok=True)
 sheet.save(out, optimize=True)
 print(f"wrote {out} ({sheet.size[0]}x{sheet.size[1]}, {out.stat().st_size // 1024} KiB)")
