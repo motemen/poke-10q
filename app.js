@@ -275,25 +275,77 @@ function buildGrid() {
   grid.append(frag);
 }
 
+// 候補一覧の更新は 2 段階で行う。
+// 1. 脱落したアイコンをその場でフェードアウトさせる（並びはまだ変えない）
+// 2. フェードが終わったら並びとサイズを確定し、残ったアイコンを元の位置から新しい位置へスライドさせる
 function renderGrid(pool, prevPool) {
+  const grid = $("#grid");
   const alive = new Set(pool.map((p) => p.id));
   const wasAlive = new Set(prevPool.map((p) => p.id));
-  for (const cell of $("#grid").children) {
+  let dropping = false;
+  for (const cell of grid.children) {
     const id = +cell.dataset.id;
-    cell.classList.toggle("out", !alive.has(id));
-    cell.classList.toggle("just-out", wasAlive.has(id) && !alive.has(id));
+    const drop = wasAlive.has(id) && !alive.has(id);
+    cell.classList.toggle("just-out", drop);
+    dropping ||= drop;
   }
   $("#count").textContent = pool.length;
   const dropped = prevPool.length - pool.length;
   $("#dropped").textContent = dropped > 0 ? `（今の質問で ${dropped} 匹脱落）` : prevPool === pool ? "" : "（今の質問では脱落なし）";
-  // 残りが少ないほどアイコンを大きくする
-  const n = pool.length;
-  $("#grid").style.setProperty("--cell", n > 300 ? "40px" : n > 60 ? "56px" : n > 16 ? "72px" : "96px");
-  // 脱落アニメーションが終わったら消す（「残りだけ」表示のとき）
+
+  const settle = () =>
+    slideLayout(() => {
+      for (const cell of grid.children) {
+        cell.classList.toggle("out", !alive.has(+cell.dataset.id));
+        cell.classList.remove("just-out");
+      }
+      // 残りが少ないほどアイコンを大きくする
+      const n = pool.length;
+      grid.style.setProperty("--cell", n > 300 ? "40px" : n > 60 ? "56px" : n > 16 ? "72px" : "96px");
+    });
   clearTimeout(state.dropTimer);
-  state.dropTimer = setTimeout(() => {
-    for (const cell of $("#grid").querySelectorAll(".just-out")) cell.classList.remove("just-out");
-  }, 650);
+  if (dropping && !reducedMotion()) state.dropTimer = setTimeout(settle, 600);
+  else settle();
+}
+
+// mutate でレイアウトが変わる前後の位置を比べ、各アイコンを元の位置から新しい位置へ動かす（FLIP）。
+// 新しく現れたアイコンはふわっと出す。
+function slideLayout(mutate) {
+  const grid = $("#grid");
+  const cells = [...grid.children];
+  const gridHeight = grid.getBoundingClientRect().height;
+  const before = new Map();
+  for (const cell of cells) {
+    const r = cell.getBoundingClientRect();
+    if (r.width) before.set(cell, r);
+  }
+  mutate();
+  if (reducedMotion()) return;
+  // 枠の高さも徐々に変えて、ページ全体がカクっとずれないようにする
+  const newHeight = grid.getBoundingClientRect().height;
+  if (Math.abs(newHeight - gridHeight) > 1)
+    grid.animate([{ height: `${gridHeight}px`, overflow: "hidden" }, { height: `${newHeight}px`, overflow: "hidden" }], {
+      duration: 550,
+      easing: "cubic-bezier(0.2, 0.8, 0.2, 1)",
+    });
+  for (const cell of cells) {
+    const r = cell.getBoundingClientRect();
+    if (!r.width) continue;
+    const b = before.get(cell);
+    if (!b) {
+      cell.animate([{ opacity: 0, transform: "scale(0.4)" }, { opacity: 1, transform: "none" }], { duration: 400, easing: "ease-out" });
+      continue;
+    }
+    const dx = b.left - r.left, dy = b.top - r.top, scale = b.width / r.width;
+    if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5 && Math.abs(scale - 1) < 0.01) continue;
+    cell.animate(
+      [
+        { transformOrigin: "0 0", transform: `translate(${dx}px, ${dy}px) scale(${scale})` },
+        { transformOrigin: "0 0", transform: "none" },
+      ],
+      { duration: 550, easing: "cubic-bezier(0.2, 0.8, 0.2, 1)" },
+    );
+  }
 }
 
 function renderHistory() {
@@ -523,7 +575,8 @@ $("#back").onclick = back;
 $("#again").onclick = start;
 $("#wrong").onclick = wrong;
 $("#toggle-all").onclick = () => {
-  const on = $("#grid").classList.toggle("show-all");
+  let on;
+  slideLayout(() => (on = $("#grid").classList.toggle("show-all")));
   $("#toggle-all").setAttribute("aria-pressed", on);
   $("#toggle-all").textContent = on ? "残りだけ表示" : "全部表示";
 };
