@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ポケモン10問</title>
+  <meta name="description" content="10の質問であなたの思い浮かべたポケモンを当てます。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Maru+Gothic:wght@500;700;900&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <header class="masthead">
+      <p class="eyebrow">全1025匹 当てますクイズ</p>
+      <h1 class="logo">ポケモン<span class="ten">10</span>問</h1>
+    </header>
+
+    <section class="card">
+      <div id="intro" class="screen">
+        <p class="big">ポケモンを1匹、<br>思い浮かべてください。</p>
+        <p>全 <strong id="total"></strong> 匹の中から、たった10回の<br>「はい／いいえ」で当ててみせます。</p>
+        <button id="start" class="primary">思い浮かべた！</button>
+      </div>
+
+      <div id="ask" class="screen" hidden>
+        <p id="qnum" class="qnum"></p>
+        <ol id="pips" class="pips" aria-hidden="true"></ol>
+        <p id="question" class="big question"></p>
+        <div class="answers">
+          <button id="yes" class="answer-btn yes"><span class="mark" aria-hidden="true">◯</span>はい</button>
+          <button id="no" class="answer-btn no"><span class="mark" aria-hidden="true">✕</span>いいえ</button>
+        </div>
+        <button id="back" class="link">ひとつ戻る</button>
+      </div>
+
+      <div id="guess" class="screen" hidden>
+        <p id="guess-lead" class="qnum">ファイナルアンサー</p>
+        <p>あなたが思い浮かべたのは……</p>
+        <div id="stage" class="stage">
+          <div id="contenders" class="contenders"></div>
+          <div class="shade" aria-hidden="true"></div>
+        </div>
+        <p id="guess-answer" class="big answer" aria-live="polite"></p>
+        <div class="buttons">
+          <button id="wrong" class="primary secondary" hidden>ちがう</button>
+          <button id="again" class="primary" hidden>もう一回</button>
+        </div>
+      </div>
+    </section>
+
+    <ol id="history" class="history"></ol>
+
+    <section class="status">
+      <div class="scorebar">
+        <p class="scoreboard">のこり <strong id="count"></strong> 匹</p>
+        <p id="dropped" class="dropped"></p>
+        <button id="toggle-all" class="toggle" aria-pressed="false">全部表示</button>
+      </div>
+      <div id="grid" class="grid" aria-label="候補のポケモン"></div>
+    </section>
+
+    <footer>
+      ポケモンのデータと画像（スプライト）は <a href="https://pokeapi.co/">PokéAPI</a> を利用しています。
+      ポケモンの名前・画像の権利は株式会社ポケモン・任天堂・クリーチャーズ・ゲームフリークに帰属します。
+    </footer>
+  </main>
+  <canvas id="confetti" class="confetti" aria-hidden="true"></canvas>
+  <script src="data/pokemon.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

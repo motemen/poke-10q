@@ -1,0 +1,281 @@
+/* クイズ番組のセット: 青い放射状の背景、黒フチ＋ずらし影のパネル、赤い◯と青い✕。
+   セットとしての見た目を固定したいので、ライト／ダークは切り替えず常にこの配色にする。 */
+:root {
+  --sky: #1f55e0;
+  --sky-ray: #2b63f0;
+  --ink: #17123f;
+  --paper: #ffffff;
+  --paper-dim: #eef1fb;
+  --sun: #ffd23f;
+  --maru: #ef3b4f;
+  --batsu: #1f7bff;
+  --muted: #5d5a7a;
+  --font-display: "Dela Gothic One", "Hiragino Sans", "Yu Gothic", sans-serif;
+  --font-body: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Hiragino Sans", "Yu Gothic", sans-serif;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background-color: var(--sky);
+  background-image: repeating-conic-gradient(from 0deg at 50% -10%, var(--sky) 0deg 9deg, var(--sky-ray) 9deg 18deg);
+  background-attachment: fixed;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-weight: 500;
+  line-height: 1.7;
+}
+main {
+  max-width: 880px;
+  margin: 0 auto;
+  padding-block: 20px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* ---- ロゴ ---- */
+.masthead { text-align: center; margin-bottom: 20px; }
+.eyebrow {
+  display: inline-block;
+  margin: 0 0 6px;
+  padding: 2px 14px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--sun);
+  font-weight: 900;
+  font-size: 0.85rem;
+  letter-spacing: 0.15em;
+}
+.logo {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2.4rem, 9vw, 3.8rem);
+  line-height: 1.1;
+  color: var(--paper);
+  -webkit-text-stroke: 2px var(--ink);
+  paint-order: stroke fill;
+  text-shadow: 4px 4px 0 var(--ink);
+  transform: rotate(-2deg);
+  text-wrap: balance;
+}
+.logo .ten { color: var(--sun); font-size: 1.35em; margin: 0 0.04em; }
+
+/* ---- パネル ---- */
+.card {
+  background: var(--paper);
+  border: 4px solid var(--ink);
+  border-radius: 20px;
+  box-shadow: 8px 8px 0 var(--ink);
+  padding: 28px 20px;
+  text-align: center;
+}
+.big { font-size: 1.35rem; font-weight: 900; margin: 8px 0 20px; text-wrap: balance; }
+.question { font-size: clamp(1.25rem, 4.2vw, 1.6rem); line-height: 1.5; min-height: 3em; }
+.qnum {
+  display: inline-block;
+  margin: 0 0 4px;
+  padding: 4px 22px;
+  background: var(--maru);
+  color: var(--paper);
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  letter-spacing: 0.08em;
+  border: 3px solid var(--ink);
+  border-radius: 10px;
+  transform: rotate(-2deg);
+  box-shadow: 3px 3px 0 var(--ink);
+}
+
+/* 何問目かを示す 10 個のランプ */
+.pips { display: flex; justify-content: center; gap: 6px; list-style: none; margin: 12px 0 4px; padding: 0; }
+.pips li { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--ink); background: var(--paper-dim); }
+.pips li.done { background: var(--sun); }
+.pips li.now { background: var(--maru); }
+
+.buttons, .answers { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin: 16px 0 8px; }
+
+button { font: inherit; cursor: pointer; }
+button.primary {
+  min-width: 140px;
+  padding: 10px 26px;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: var(--sun);
+  color: var(--ink);
+  font-weight: 900;
+  font-size: 1.1rem;
+  box-shadow: 4px 4px 0 var(--ink);
+  transition: transform 0.08s, box-shadow 0.08s;
+}
+button.primary.secondary { background: var(--paper); }
+button.primary:hover, .answer-btn:hover { transform: translate(-1px, -1px); box-shadow: 5px 5px 0 var(--ink); }
+button.primary:active, .answer-btn:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--ink); }
+
+.answer-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 150px;
+  padding: 8px 0 12px;
+  border: 4px solid var(--ink);
+  border-radius: 18px;
+  color: var(--paper);
+  font-weight: 900;
+  font-size: 1.1rem;
+  box-shadow: 5px 5px 0 var(--ink);
+  transition: transform 0.08s, box-shadow 0.08s;
+}
+.answer-btn .mark { font-size: 3.4rem; line-height: 1.1; font-weight: 900; }
+.answer-btn.yes { background: var(--maru); }
+.answer-btn.no { background: var(--batsu); }
+
+button.link { background: none; border: 0; color: var(--muted); text-decoration: underline; font-size: 0.9rem; margin-top: 4px; }
+button:disabled { opacity: 0.3; cursor: default; }
+button:focus-visible { outline: 3px solid var(--sun); outline-offset: 3px; }
+
+/* ---- これまでの質問 ---- */
+.history {
+  list-style: none;
+  margin: 20px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+  counter-reset: q;
+}
+.history:empty { display: none; }
+.history li {
+  counter-increment: q;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+  font-size: 0.9rem;
+}
+.history li::before { content: "Q" counter(q); font-family: var(--font-display); color: var(--maru); min-width: 2.2em; }
+.history .q { flex: 1; min-width: 0; }
+.history .a {
+  flex: none;
+  width: 1.9em;
+  height: 1.9em;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--paper);
+  font-weight: 900;
+}
+.history .a.yes { background: var(--maru); }
+.history .a.no { background: var(--batsu); }
+.history .n { flex: none; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* ---- 得点板と候補一覧 ---- */
+.status { margin-top: 20px; }
+.scorebar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-bottom: 12px; }
+.scoreboard {
+  margin: 0;
+  padding: 4px 18px;
+  background: var(--ink);
+  color: var(--paper);
+  border: 3px solid var(--sun);
+  border-radius: 12px;
+  font-weight: 900;
+}
+.scoreboard strong {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 2rem;
+  color: var(--sun);
+  font-variant-numeric: tabular-nums;
+  margin: 0 4px;
+}
+.dropped { margin: 0; color: var(--paper); font-weight: 700; flex: 1; min-width: 0; }
+.toggle {
+  padding: 4px 14px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.toggle[aria-pressed="true"] { background: var(--sun); }
+
+.grid {
+  --cell: 40px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--cell), 1fr));
+  padding: 10px;
+  background: var(--paper);
+  border: 3px solid var(--ink);
+  border-radius: 16px;
+}
+.cell { aspect-ratio: 1; max-width: 100%; transition: opacity 0.6s, filter 0.6s, transform 0.6s; }
+.cell .sprite { width: 100%; transform: scale(1.3); }
+.cell.out { opacity: 0.12; filter: grayscale(1); }
+.cell.just-out { animation: drop 0.6s forwards; }
+@keyframes drop {
+  from { opacity: 1; filter: none; transform: scale(1.2); }
+  to { opacity: 0; filter: grayscale(1); transform: scale(0.6) rotate(-20deg); }
+}
+/* 普段は残っている候補だけ。脱落したものはアニメーションのあと消える */
+.grid:not(.show-all) .cell.out:not(.just-out) { display: none; }
+.grid.show-all .cell.just-out { animation-fill-mode: none; }
+
+/* スプライトシートから 1 匹分を切り出して表示する（位置とサイズは app.js で指定） */
+.sprite {
+  aspect-ratio: 1;
+  max-width: 100%;
+  background-image: url("sprites.png");
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+}
+
+/* ---- 最後の 2 択: 暗い舞台に、くっきりした円のスポットライト ---- */
+.stage {
+  --stage-bg: #fbf3d9;
+  --shade: rgba(10, 8, 30, 0.92);
+  --x: 50%;
+  --y: 50%;
+  --r: 0px;
+  position: relative;
+  max-width: 520px;
+  margin: 12px auto 16px;
+  border: 4px solid var(--ink);
+  border-radius: 16px;
+  background: var(--stage-bg);
+  color: var(--ink);
+  overflow: hidden;
+}
+.contenders {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  min-height: 280px;
+  padding: 24px 8px;
+}
+.shade { position: absolute; inset: 0; background: var(--shade); pointer-events: none; }
+.stage.lit .shade {
+  background: radial-gradient(circle var(--r) at var(--x) var(--y), transparent calc(var(--r) - 1px), var(--shade) var(--r));
+}
+.contender { margin: 0; text-align: center; transition: transform 0.35s cubic-bezier(0.3, 1.6, 0.5, 1); }
+.contender .sprite { width: min(160px, 100%); margin: 0 auto; }
+.contender figcaption { font-weight: 900; }
+.stage.decided .contender.chosen { transform: scale(1.15); }
+.answer { font-family: var(--font-display); font-weight: 400; font-size: 1.7rem; min-height: 1.5em; margin: 0; }
+
+.confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 20; }
+
+footer { margin-top: 32px; font-size: 0.8rem; color: var(--paper); }
+footer a { color: inherit; }
+
+@media (max-width: 480px) {
+  .answer-btn { width: 130px; }
+  .grid { --cell: 34px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cell, .cell.just-out, .contender, button.primary, .answer-btn { transition: none; animation: none; }
+}
